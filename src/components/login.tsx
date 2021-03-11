@@ -14,7 +14,7 @@ const Login: React.FC = () => {
             const response = await axios({
               headers: { "Access-Control-Allow-Origin": "*" },
               method: "post",
-              url: "http://dev.rapptrlabs.com/Tests/scripts/user-login.php",
+              url: "https://dev.rapptrlabs.com/Tests/scripts/user-login.php",
               data: {
                 email: username,
                 password: password,
