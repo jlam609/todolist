@@ -1,26 +1,45 @@
 import React, { useState } from "react";
 import { isEmail, isPassword } from "../validate";
+import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
+import { useHistory } from "react-router";
+import { StoreState } from "../store/store";
+import { login } from "../store/actions";
 
 const Login: React.FC = () => {
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [serverError, setServerError] = useState("");
+  const dispatch = useDispatch();
+  const { loggedIn } = useSelector((state: StoreState) => state);
+  const history = useHistory();
+  if (loggedIn) {
+    history.push("/tasks");
+  }
   return (
     <div>
+      <h1 className="title">Rapptr Labs</h1>
       <div>
         <form
           onSubmit={async (e) => {
             e.preventDefault();
-            const response = await axios({
-              headers: { "Access-Control-Allow-Origin": "*" },
-              method: "post",
-              url: "https://dev.rapptrlabs.com/Tests/scripts/user-login.php",
-              data: {
-                email: username,
-                password: password,
-              },
-            });
-            console.log(response);
+            try {
+              const status = (
+                await axios.post("/api/login", {
+                  email: username,
+                  password: password,
+                })
+              ).data;
+              if (status) {
+                await dispatch(login());
+                history.push("/tasks");
+              }
+            } catch (e) {
+              console.log("error");
+              setServerError(
+                "The Server Could Not Be Reached Or Login Was Unsuccessful. Please Try Again Later"
+              );
+            }
           }}
         >
           <div className="input-container">
@@ -87,6 +106,7 @@ const Login: React.FC = () => {
           >
             Login
           </button>
+          <h5 className="error-message">{serverError}</h5>
         </form>
       </div>
     </div>
